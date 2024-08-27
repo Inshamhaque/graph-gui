@@ -3,18 +3,17 @@ import java.awt.*;
 import java.util.*;
 
 public class Main {
-
     public static void main(String[] args) {
-        // Create a new graph
+        // Creating the graph
         Graph graph = new Graph();
 
-        // Input for vertices
+        // taking user inputs for number of vertices
         int numVertices = Integer.parseInt(JOptionPane.showInputDialog("Enter the number of vertices:"));
         for (int i = 1; i <= numVertices; i++) {
             graph.addVertex(i);
         }
 
-        // Input for edges
+        // taking user inputs for number of edges
         int numEdges = Integer.parseInt(JOptionPane.showInputDialog("Enter the number of edges:"));
         for (int i = 0; i < numEdges; i++) {
             int source = Integer.parseInt(JOptionPane.showInputDialog("Enter the source vertex for edge " + (i + 1) + ":"));
@@ -23,20 +22,24 @@ public class Main {
             graph.addEdge(source, dest, weight);
         }
 
-        // Define vertex locations dynamically
+        // we use a circular type of representation for representing the graph
         Map<Integer, Point> vertexLocations = new HashMap<>();
-        Random random = new Random();
+        int radius = 250;  // Radius of the circle
+        int centerX = 400; // X coordinate of the center
+        int centerY = 300; // Y coordinate of the center
+        double angleStep = 2 * Math.PI / numVertices;
+
         for (int i = 1; i <= numVertices; i++) {
-            int x = 50 + random.nextInt(700); // X coordinate between 50 and 750
-            int y = 50 + random.nextInt(500); // Y coordinate between 50 and 550
+            int x = (int) (centerX + radius * Math.cos(i * angleStep));
+            int y = (int) (centerY + radius * Math.sin(i * angleStep));
             vertexLocations.put(i, new Point(x, y));
         }
 
         // Print the graph's adjacency list
-        System.out.println("Graph adjacency list:");
+        System.out.println("Graph adjacency list:"); //debugging statement
         System.out.println(graph.getAll());
 
-        // Create the JFrame and add the GraphVisualizer panel
+        // basic create the JFrame and add the GraphVisualizer panel
         JFrame frame = new JFrame("Graph Visualizer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());

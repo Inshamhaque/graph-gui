@@ -7,7 +7,7 @@ import java.util.*;
 public class GraphVisualizer extends JPanel {
     private Graph graph;
     private Map<Integer, Point> vertexLocations;
-    private ArrayList<Integer> bfsTraversal;
+    private ArrayList<Integer> traversal;
     private GraphAlgo graphAlgo;
     private int step;
     private javax.swing.Timer timer;
@@ -17,20 +17,21 @@ public class GraphVisualizer extends JPanel {
         this.graph = graph;
         this.vertexLocations = vertexLocations;
         this.graphAlgo = new GraphAlgo();
-        this.bfsTraversal = null;
+        this.traversal = null;
         this.step = 0;
 
         setPreferredSize(new Dimension(800, 600));
         setLayout(new BorderLayout());
 
+        // BFS Button
         JButton bfsButton = new JButton("Start BFS");
         bfsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     int startNode = Integer.parseInt(JOptionPane.showInputDialog("Enter start node for BFS:"));
-                    bfsTraversal = graphAlgo.bfs(graph, startNode);
-                    System.out.println("BFS Traversal: " + bfsTraversal); // Debug statement
+                    traversal = graphAlgo.bfs(graph, startNode);
+                    System.out.println("BFS Traversal: " + traversal); // Debug statement
                     step = 0;
                     startAnimation();
                 } catch (NumberFormatException ex) {
@@ -39,10 +40,32 @@ public class GraphVisualizer extends JPanel {
             }
         });
 
-        resultLabel = new JLabel("BFS Traversal: ");
+        // DFS Button
+        JButton dfsButton = new JButton("Start DFS");
+        dfsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int startNode = Integer.parseInt(JOptionPane.showInputDialog("Enter start node for DFS:"));
+                    traversal = graphAlgo.dfsOfGraph(graph, startNode);
+                    System.out.println("DFS Traversal: " + traversal); // Debug statement
+                    step = 0;
+                    startAnimation();
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(GraphVisualizer.this, "Invalid node number.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        resultLabel = new JLabel("Traversal: ");
         resultLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        add(bfsButton, BorderLayout.NORTH);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+        buttonPanel.add(bfsButton);
+        buttonPanel.add(dfsButton);
+
+        add(buttonPanel, BorderLayout.NORTH);
         add(resultLabel, BorderLayout.SOUTH);
     }
 
@@ -54,7 +77,7 @@ public class GraphVisualizer extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 step++;
-                if (step >= bfsTraversal.size()) {
+                if (step >= traversal.size()) {
                     timer.stop();
                     updateResultLabel();
                 }
@@ -65,8 +88,8 @@ public class GraphVisualizer extends JPanel {
     }
 
     private void updateResultLabel() {
-        if (bfsTraversal != null) {
-            resultLabel.setText("BFS Traversal: " + bfsTraversal.toString());
+        if (traversal != null) {
+            resultLabel.setText("Traversal: " + traversal.toString());
         }
     }
 
@@ -92,7 +115,7 @@ public class GraphVisualizer extends JPanel {
         for (Map.Entry<Integer, Point> entry : vertexLocations.entrySet()) {
             int node = entry.getKey();
             Point p = entry.getValue();
-            if (bfsTraversal != null && bfsTraversal.contains(node) && bfsTraversal.indexOf(node) <= step) {
+            if (traversal != null && traversal.contains(node) && traversal.indexOf(node) <= step) {
                 g.setColor(Color.BLUE);  // Visited nodes
             } else {
                 g.setColor(Color.RED);   // Unvisited nodes
@@ -102,16 +125,16 @@ public class GraphVisualizer extends JPanel {
             g.drawString(Integer.toString(node), p.x - 5, p.y + 5);  // Centered text
         }
 
-        // Highlight BFS traversal path
-        if (bfsTraversal != null && step > 0) {
+        // Highlight traversal path
+        if (traversal != null && step > 0) {
             g.setColor(Color.GREEN);
             for (int i = 0; i < step; i++) {
-                int node = bfsTraversal.get(i);
+                int node = traversal.get(i);
                 Point p = vertexLocations.get(node);
                 if (p != null) {
                     g.drawString(Integer.toString(node), p.x - 5, p.y - 15);
                     if (i > 0) {
-                        int prevNode = bfsTraversal.get(i - 1);
+                        int prevNode = traversal.get(i - 1);
                         Point prevPoint = vertexLocations.get(prevNode);
                         if (prevPoint != null) {
                             g.drawLine(prevPoint.x, prevPoint.y, p.x, p.y);
